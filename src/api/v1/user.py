@@ -1,7 +1,10 @@
+from io import BytesIO
+
+import pandas as pd
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.future import select
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.base.pg_db import get_db
@@ -26,13 +29,13 @@ async def login(
     result = await db.execute(select(User).where(User.username == form_data.username))
     user = result.scalars().first()
 
-    if not user or verify_password(form_data.password, user.password):
+    if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Login bo'lmayabti")
 
     access_token = create_access_token({"user": user.username, "role": user.role})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@user_router.post()
+
 
 @user_router.post("/add")
 async def add_user(
@@ -58,3 +61,53 @@ async def add_user(
     await db.refresh(new_user)
 
     return new_user
+
+
+
+@user_router.post("/add_excel")
+async def add_excel_user(
+        file: UploadFile = File(...),
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "super_admin":
+        raise NotSuperadminException
+
+    try:
+        contents = await file.read()
+        excel_data = pd.read_excel(BytesIO(contents), engine="openpyxl")
+    except Exception:
+        raise ValueError("Faylni o‘qib bo‘lmadi. Iltimos, to‘g‘ri formatdagi Excel fayl yuklang.")
+
+    required_columns = {"full_name", "username", "password", "role", "position"}
+    if not required_columns.issubset(excel_data.columns):
+        raise ValueError("Excel faylida kerakli ustunlar yo‘q")
+
+    users_to_add = []
+    for _, row in excel_data.iterrows():
+        if pd.isna(row["username"]) or pd.isna(row["password"]):
+            continue  # Bo'sh username yoki password bo'lsa o'tkazib yuboramiz
+
+        result = await db.execute(select(User).where(User.username == row["username"]))
+        existing_user = result.scalar_one_or_none()
+        if existing_user:
+            continue
+
+        hashed_password = hash_password(row["password"])
+        new_user = User(
+            username=row["username"],
+            full_name=row.get("full_name", ""),
+            role=row["role"],
+            position=row.get("position", ""),
+            password=hashed_password,
+        )
+
+        db.add(new_user)
+        users_to_add.append(new_user)
+
+    if users_to_add:
+        await db.commit()
+        for user in users_to_add:
+            await db.refresh(user)
+
+    return {"message": f"{len(users_to_add)} ta foydalanuvchi qo‘shildi"}
