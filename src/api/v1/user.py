@@ -4,11 +4,11 @@ import pandas as pd
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.future import select
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.base.pg_db import get_db
-from src.exceptions import NotSuperadminException, UsernameException
+from src.exceptions import NotSuperadminException, UsernameException, NotUsernameException
 from src.models import User
 from src.schema.user import UserCreateRequest
 from src.security import get_current_user
@@ -77,7 +77,7 @@ async def add_excel_user(
         contents = await file.read()
         excel_data = pd.read_excel(BytesIO(contents), engine="openpyxl")
     except Exception:
-        raise ValueError("Faylni o‘qib bo‘lmadi. Iltimos, to‘g‘ri formatdagi Excel fayl yuklang.")
+        raise ValueError("Faylni o‘qib bo‘lmadi.Excel fayl yuklang.")
 
     required_columns = {"full_name", "username", "password", "role", "position"}
     if not required_columns.issubset(excel_data.columns):
@@ -86,7 +86,7 @@ async def add_excel_user(
     users_to_add = []
     for _, row in excel_data.iterrows():
         if pd.isna(row["username"]) or pd.isna(row["password"]):
-            continue  # Bo'sh username yoki password bo'lsa o'tkazib yuboramiz
+            continue
 
         result = await db.execute(select(User).where(User.username == row["username"]))
         existing_user = result.scalar_one_or_none()
@@ -111,3 +111,38 @@ async def add_excel_user(
             await db.refresh(user)
 
     return {"message": f"{len(users_to_add)} ta foydalanuvchi qo‘shildi"}
+
+
+
+
+@user_router.get("/")
+async def get_user(username: str, current_user = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+
+    if current_user.role != "super_admin":
+        raise NotSuperadminException
+
+    result = await db.execute(select(User).where(User.username==username))
+    user = result.scalars().first()
+
+    if user is None:
+        raise NotUsernameException
+
+    return user
+
+
+@user_router.delete("/delete")
+async def delete_user(username: str=Query(...), current_user = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+
+    if current_user.role !="super_admin":
+        raise  NotSuperadminException
+
+    result = await  db.execute(select(User).where(User.username==username))
+    user = result.scalars().first()
+
+    if user is None:
+        raise NotUsernameException
+
+    await db.delete(user)
+    await db.commit()
+
+    return (f"{username} ochirildi")

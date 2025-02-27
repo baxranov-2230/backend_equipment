@@ -19,14 +19,10 @@ class UserData(BaseModel):
 
 
 class UserCreateRequest(UserData):
-    pass
+    class Config:
+        from_attributes = True
 
-class UserCreateResponse(BaseModel):
+class UserCreateResponse(UserData):
     id: int
-    full_name: str
-    username: str
-    role: str
-    position: str
-
     class Config:
         from_attributes = True

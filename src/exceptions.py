@@ -49,3 +49,11 @@ class SecurityException(HTTPException):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Qandaydir xatolik roy berdi ",
             headers={"WWW-Authenticate": "Bearer"})
+
+
+class NotUsernameException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Bunday username orqali foydalanuvchi royxatda mavjud emas ",
+            headers={"WWW-Authenticate": "Bearer"})
