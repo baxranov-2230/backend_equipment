@@ -145,4 +145,4 @@ async def delete_user(username: str=Query(...), current_user = Depends(get_curre
     await db.delete(user)
     await db.commit()
 
-    return (f"{username} ochirildi")
+    return f"{username} ochirildi"
