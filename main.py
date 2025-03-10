@@ -11,11 +11,11 @@ from src.base.pg_db import get_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    db_gen = get_db()  # Generator yaratamiz
-    db: AsyncSession = await anext(db_gen)  # `await anext(...)` bilan sessiyani olamiz
+    db_gen = get_db()
+    db: AsyncSession = await anext(db_gen)
 
     try:
-        await create_super_admin(db)  # Super adminni yaratish
+        await create_super_admin(db)
         yield
     finally:
         await db.close()

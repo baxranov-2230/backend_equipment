@@ -25,7 +25,7 @@ async def create_super_admin(db: AsyncSession):
             username=os.getenv('SUPER_ADMIN_USERNAME'),
             password=hash_password(os.getenv('SUPER_ADMIN_PASSWORD')),
             role='super_admin',
-            position='Boshliq'
+            contact='+998941836966'
         )
         db.add(super_admin)
         await db.commit()

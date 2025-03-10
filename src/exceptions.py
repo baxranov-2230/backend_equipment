@@ -57,3 +57,13 @@ class NotUsernameException(HTTPException):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Bunday username orqali foydalanuvchi royxatda mavjud emas ",
             headers={"WWW-Authenticate": "Bearer"})
+
+
+
+
+class DepartmentException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Bu department allaqochon mavjud ",
+            headers={"WWW-Authenticate": "Bearer"})

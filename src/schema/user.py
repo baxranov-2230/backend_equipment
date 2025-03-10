@@ -2,11 +2,13 @@ import bcrypt
 from pydantic import BaseModel, field_validator
 
 class UserData(BaseModel):
+    department_id: int
     full_name: str
     username: str
     password: str
-    role: str
-    position: str
+    role:str
+
+    contact: str
 
     @field_validator("password", mode="plain")
     @staticmethod
