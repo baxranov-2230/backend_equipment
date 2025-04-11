@@ -8,12 +8,15 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    department_id = Column(Integer, ForeignKey("departments.id"))
+    department_id = Column(Integer, ForeignKey('departments.id'))
     full_name = Column(String, nullable=False)
     username = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
+    password = Column(String, nullable=False, unique=True)
     role = Column(String, nullable=False)
     contact = Column(String, nullable=False)
 
-    department = relationship("Department", back_populates="users")
-    products = relationship("Product", back_populates="user")
+
+    departments = relationship('Department', back_populates='users')
+    devices = relationship('Device', back_populates='users')
+
+

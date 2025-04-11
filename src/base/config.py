@@ -13,9 +13,11 @@ class Settings(BaseSettings):
     DB_PORT: str = os.getenv('DB_PORT')
     DB_NAME: str = os.getenv('DB_NAME')
 
-    SECRET_KEY: str = os.getenv('SECRET_KEY')
+    ACCESS_SECRET_KEY: str = os.getenv('ACCESS_SECRET_KEY')
+    REFRESH_SECRET_KEY: str = os.getenv('REFRESH_SECRET_KEY')
     ALGORITHM: str = os.getenv('ALGORITHM')
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES')
+    REFRESH_TOKEN_EXPIRE_DAYS: int = os.getenv('REFRESH_TOKEN_EXPIRE_DAYS')
 
     @property
     def connection_string(self):

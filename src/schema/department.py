@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
 class DepartmentData(BaseModel):
     name: str
+    created_at: datetime
 
 
 class DepartmentRequest(DepartmentData):
