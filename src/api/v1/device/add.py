@@ -6,7 +6,7 @@ from src.models import Device
 from src.schema.devices import DevicesCreateRequest, DevicesCreateResponse
 from src.security import get_current_user, has_access
 
-router = APIRouter(prefix="/devices", tags = ["Device"])
+router = APIRouter( tags = ["Device"])
 
 @router.post("/add_device")
 @has_access(roles=['super_admin'])
@@ -15,11 +15,15 @@ async def add_device(
                         db: AsyncSession = Depends(get_db),
                         current_user = Depends(get_current_user)
                     ):
-
-    new_device = Device(**data_device.model_dump())
-
+    new_device = Device(name=data_device.name,
+                        serial_number=data_device.serial_number,
+                        status=data_device.status,
+                        user_id=data_device.user_id,
+                        category_id=data_device.category_id,
+                        )
     db.add(new_device)
     await db.commit()
     await db.refresh(new_device)
 
-    return DevicesCreateResponse
+    return "Device muvaffaqiyatli yaratildi"
+    # return DevicesCreateResponse

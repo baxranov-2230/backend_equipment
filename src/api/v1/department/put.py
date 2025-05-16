@@ -10,14 +10,8 @@ from src.models import Department
 from src.schema.department import DepartmentRequest
 from src.security import get_current_user, has_access
 
-router = APIRouter (prefix='/department', tags=['Department'])
-
-
-
-
-
-
-@router.put("/")
+router = APIRouter (tags=['Department'])
+@router.put("/update_department/{department_id}")
 @has_access(roles=['super_admin'])
 async def change_department(
                                 department_id: int,
@@ -26,7 +20,7 @@ async def change_department(
                                 db: AsyncSession=Depends(get_db)
                             ):
 
-    result = await db.execute(select(Department).where(Department.id==department_id))
+    result = await db.execute(select(Department).where(department_id==Department.id))
     department =result.scalar_one_or_none()
 
     if department is None:
@@ -39,7 +33,5 @@ async def change_department(
     db.add(department)
     await db.commit()
     await db.refresh(department)
-
-    print(f"Admin foydalanuvchi {current_user.username} {department.name} bo‘limini yangiladi")
 
     return f"Department '{department.name}' muvaffaqiyali ozgartirildi"

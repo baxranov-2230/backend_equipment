@@ -9,7 +9,7 @@ from src.models import Device
 from src.schema.devices import DevicesCreateRequest
 from src.security import get_current_user, has_access
 
-router = APIRouter(prefix="/devices", tags = ["Device"])
+router = APIRouter( tags = ["Device"])
 
 
 @router.put("/update")

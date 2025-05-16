@@ -7,7 +7,7 @@ from src.exceptions import NotDeviceException
 from src.models import Device
 from src.security import get_current_user, has_access
 
-router = APIRouter(prefix="/devices", tags = ["Device"])
+router = APIRouter( tags = ["Device"])
 
 
 @router.delete("/delete")

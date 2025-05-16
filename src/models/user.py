@@ -14,6 +14,7 @@ class User(Base):
     password = Column(String, nullable=False, unique=True)
     role = Column(String, nullable=False)
     contact = Column(String, nullable=False)
+    number_room = Column(String, nullable=True)
 
 
     departments = relationship('Department', back_populates='users')

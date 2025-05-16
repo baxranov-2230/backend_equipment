@@ -10,6 +10,8 @@ from src.api.v1.user.refresh import router as refresh_user
 from src.api.v1.user.login import router as login_user
 from src.api.v1.user.logout import router as logout_user
 from src.api.v1.user.register import router as register_user
+from src.api.v1.user.get_users import router as all_users
+from src.api.v1.user.update_user import router as update_user
 
 
 user_router.include_router(add_user)
@@ -19,3 +21,5 @@ user_router.include_router(refresh_user)
 user_router.include_router(login_user)
 user_router.include_router(logout_user)
 user_router.include_router(register_user)
+user_router.include_router(all_users)
+user_router.include_router(update_user)

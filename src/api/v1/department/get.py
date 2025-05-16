@@ -7,12 +7,12 @@ from src.exceptions import  NotDepartmentException
 from src.models import Department
 from src.security import get_current_user, has_access
 
-router = APIRouter (prefix='/department', tags=['Department'])
+router = APIRouter ( tags=['Department'])
 
 
 
 
-@router.get("/")
+@router.get("/get_departments")
 @has_access(roles=['super_admin'])
 async def get_department(db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
 

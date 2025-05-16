@@ -67,12 +67,6 @@ class NotTokenException(HTTPException):
             detail="token yaroqsiz yoki muddato otgan",
             headers={"WWW-Authenticate": "Bearer"})
 
-
-
-
-
-
-
 class DepartmentException(HTTPException):
     def __init__(self):
         super().__init__(

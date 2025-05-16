@@ -8,6 +8,7 @@ class UserData(BaseModel):
     password: str
     role:str
     contact: str
+    number_room: str
 
 
 
@@ -27,3 +28,11 @@ class UserCreateResponse(UserData):
     id: int
     class Config:
         from_attributes = True
+
+class UserUpdate(BaseModel):
+    department_id: int
+    full_name: str
+    username: str
+    role: str
+    contact: str
+    number_room: str
